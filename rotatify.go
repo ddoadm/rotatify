@@ -1,6 +1,10 @@
 package rotatify
 
 import (
+	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"sync"
@@ -57,7 +61,19 @@ func (r *Rotatify) rotateProxy() {
 	r.proxyIndex = (r.proxyIndex + 1) % len(r.Proxies)
 }
 
-func (r *Rotatify) StartRotateProxies() {
+func printIP(url string, r *Rotatify) {
+	resp, _ := r.Get(url)
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Fatalf("Close Error : %s", err)
+		}
+	}(resp.Body)
+	b, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(b))
+}
+
+func (r *Rotatify) StartRotateProxies(url string) {
 	t := time.NewTicker(r.RotateInterval)
 	defer t.Stop()
 
@@ -65,6 +81,7 @@ func (r *Rotatify) StartRotateProxies() {
 		select {
 		case <-t.C:
 			r.mux.Lock()
+			printIP(url, r)
 			r.rotateProxy()
 			r.mux.Unlock()
 		case <-r.stopRotateProxiesCh:
