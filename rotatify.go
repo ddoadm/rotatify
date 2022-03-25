@@ -63,13 +63,13 @@ func (r *Rotatify) rotateProxy() {
 
 func printIP(url string, r *Rotatify) {
 	resp, _ := r.Get(url)
+	b, _ := ioutil.ReadAll(resp.Body)
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
 			log.Fatalf("Close Error : %s", err)
 		}
 	}(resp.Body)
-	b, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(b))
 }
 
