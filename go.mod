@@ -1,4 +1,4 @@
-module github.com/dqn/rotatify
+module github.com/ddoadm/rotatify
 
 go 1.15
 
